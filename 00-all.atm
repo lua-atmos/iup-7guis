@@ -5,10 +5,14 @@ func showxy (dlg, ...) {
     return(dlg.showxy(dlg, ...))
 }
 
-val iup_button = iup.button
 func iup_action (...) {
     emit(:action, ...)
 }
+func iup_value (...) {
+    emit(:value, ...)
+}
+
+val iup_button = iup.button
 set iup.button = func (...) {
     val h = iup_button(...)
     set h.action = iup_action
@@ -16,27 +20,58 @@ set iup.button = func (...) {
 }
 
 val iup_text = iup.text
-func iup_value (...) {
-    emit(:value, ...)
-}
 set iup.text = func (...) {
     val h = iup_text(...)
     set h.valuechanged_cb = iup_value
     return(h)
 }
 
+val iup_list = iup.list
+set iup.list = func (...) {
+    val h = iup_list(...)
+    set h.valuechanged_cb = iup_value
+    return(h)
+}
+
+set iup.main = func () {
+    assert(iup.MainLoopLevel() == 0)
+    iup.MainLoop()
+    iup.Close()
+}
+
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 val lbl = iup.label <- [
-    value = "label title",
+    title = "label title",
 ]
 
-val txt = iup.text <- [
-    value    = "default text",
-    readonly = true,
+val txt1 = iup.text <- [
+    value    = "read-only text",
+    readonly = 'YES',
     size     = 60,
 ]
+
+val txt2 = iup.text <- [
+    value = "default text",
+    mask = "[+/-]?(/d+/.?/d*|/./d+)",
+    size  = 60,
+]
+
+val lst = iup.list <- [
+    "option 1", "option 2", "option 3",
+    dropdown = "YES",
+    value    = 2,
+    expand   = "HORIZONTAL",
+]
+
+val gau = iup.gauge <- [
+    min = .1,
+    max = 30,
+    ;;expand = "HORIZONTAL",
+    ;;showtext = "NO",
+]
+
 
 val but = iup.button <- [
     title = "button title",
@@ -45,7 +80,8 @@ val but = iup.button <- [
 
 val box = iup.vbox <- [
     ngap = 10,
-    lbl, txt, but,
+    alignment = "acenter",
+    lbl, txt1, txt2, lst, gau, but,
 ]
 
 val dlg = iup.dialog <- [
@@ -60,11 +96,15 @@ spawn {
             print <- "button clicked"
         }
     } with {
-        every (:action, evt==but) {
-            print <- "button clicked"
+        every (:value, evt==txt2) {
+            print <- txt2.value
+        }
+    } with {
+        every (:value, evt==lst) {
+            print <- lst.value
         }
     }
 }
 
 dlg->showxy(iup.CENTER, iup.CENTER)
-iup.MainLoop()
+iup.main()
