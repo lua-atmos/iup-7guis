@@ -43,8 +43,7 @@ func await_iup (h, evt) {
 }
 
 spawn {
-    loop {
-        await(:action, it==btn_count)
+    every (:action, it==btn_count) {
         addCount()
         set txt_count.value = getCount()
     }
