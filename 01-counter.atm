@@ -11,8 +11,8 @@ func getCount () {
 	return(counter)
 }
 
-func iup_action (h) {
-    emit(:action, h)
+func iup_action (...) {
+    emit(:action, ...)
 }
 
 val iup_button = iup.button
@@ -33,21 +33,11 @@ val dlg = iup.dialog <- [
 ]
 dlg.showxy(dlg, iup.CENTER, iup.CENTER )
 
-func await_iup (h, evt) {
-    set h[evt] = func (...) {
-        print(...)
-        print(evt, h)
-        emit(evt, h)
-    }
-    await(evt, it==h)
-}
-
 spawn {
     every (:action, it==btn_count) {
         addCount()
         set txt_count.value = getCount()
     }
 }
-
 
 iup.MainLoop()
