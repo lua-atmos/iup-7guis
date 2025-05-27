@@ -66,22 +66,25 @@ val lst = iup.list <- [
 ]
 
 val gau = iup.gauge <- [
-    min = .1,
+    min = 0.1,
     max = 30,
     ;;expand = "HORIZONTAL",
     ;;showtext = "NO",
 ]
-
 
 val but = iup.button <- [
     title = "button title",
     size  = 60,
 ]
 
+val out = iup.label <- [
+    title = "label title",
+]
+
 val box = iup.vbox <- [
     ngap = 10,
     alignment = "acenter",
-    lbl, txt1, txt2, lst, gau, but,
+    lbl, txt1, txt2, lst, gau, but, out,
 ]
 
 val dlg = iup.dialog <- [
@@ -91,17 +94,23 @@ val dlg = iup.dialog <- [
 ]
 
 spawn {
+;;;
+    spawn {
+        every 100:ms {
+        }
+    }
+;;;
     par {
         every (:action, evt==but) {
-            print <- "button clicked"
+            set out.title = "button clicked"
         }
     } with {
         every (:value, evt==txt2) {
-            print <- txt2.value
+            set out.title = txt2.value
         }
     } with {
         every (:value, evt==lst) {
-            print <- lst.value
+            set out.title = lst.value
         }
     }
 }
