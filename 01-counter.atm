@@ -34,10 +34,12 @@ val dlg = iup.dialog <- [
 dlg.showxy(dlg, iup.CENTER, iup.CENTER )
 
 spawn {
-    every (:action, it==btn_count) {
+    every (:action, evt==btn_count) {
         addCount()
         set txt_count.value = getCount()
     }
 }
 
-iup.MainLoop()
+if (iup.MainLoopLevel()==0) {
+  iup.MainLoop()
+}

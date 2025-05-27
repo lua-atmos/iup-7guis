@@ -50,14 +50,15 @@ val dlg = iup.dialog <- [iup.hbox <- [txt_celcius, lbl_celcius, txt_fahrenheit, 
 dlg.showxy(dlg, iup.CENTER, iup.CENTER )
 
 spawn {
-        every :value , it==txt_celcius {
+    par {
+        every :value , evt==txt_celcius {
             set txt_fahrenheit.value = celcius2fahrenheit(attrib2number(txt_celcius.value))
         }
-}
-spawn {
-        every :value , it==txt_fahrenheit {
+    } with {
+        every :value , evt==txt_fahrenheit {
             set txt_celcius.value = fahrenheit2celcius(attrib2number(txt_fahrenheit.value))
         }
+    }
 }
 
 if (iup.MainLoopLevel()==0) {

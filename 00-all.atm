@@ -1,0 +1,70 @@
+set package.cpath = package.cpath ++ ';/usr/lib64/libiuplua54.so'
+require <- "iuplua"
+
+func showxy (dlg, ...) {
+    return(dlg.showxy(dlg, ...))
+}
+
+val iup_button = iup.button
+func iup_action (...) {
+    emit(:action, ...)
+}
+set iup.button = func (...) {
+    val h = iup_button(...)
+    set h.action = iup_action
+    return(h)
+}
+
+val iup_text = iup.text
+func iup_value (...) {
+    emit(:value, ...)
+}
+set iup.text = func (...) {
+    val h = iup_text(...)
+    set h.valuechanged_cb = iup_value
+    return(h)
+}
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+val lbl = iup.label <- [
+    value = "label title",
+]
+
+val txt = iup.text <- [
+    value    = "default text",
+    readonly = true,
+    size     = 60,
+]
+
+val but = iup.button <- [
+    title = "button title",
+    size  = 60,
+]
+
+val box = iup.vbox <- [
+    ngap = 10,
+    lbl, txt, but,
+]
+
+val dlg = iup.dialog <- [
+    title  = "dialog title",
+    margin = "10x10",
+    box
+]
+
+spawn {
+    par {
+        every (:action, evt==but) {
+            print <- "button clicked"
+        }
+    } with {
+        every (:action, evt==but) {
+            print <- "button clicked"
+        }
+    }
+}
+
+dlg->showxy(iup.CENTER, iup.CENTER)
+iup.MainLoop()
