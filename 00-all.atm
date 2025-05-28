@@ -13,12 +13,19 @@ set iup.showxy = func (dlg, ...) {
     return(dlg.showxy(dlg, ...))
 }
 
+
 func iup_cb_action (h) {
     emit(:action [ h=h ])
 }
+func iup_cb_action_canvas (h, x, y) {
+    emit(:action [ h=h, x=x, y=y ])
+}
+func iup_cb_action_list (h, text, item, state, x, y) {
+    emit(:action [ h=h, text=text, item=item, state=(state==1), x=x, y=y ])
+}
 
-func iup_cb_canvas_action (h, x, y) {
-    emit(:canvas [ h=h, x=x, y=y ])
+func iup_cb_button (h, button, pressed, x, y, mods) {
+    emit(:button [ h=h, button=button, pressed=(pressed==1), x=x, y=y, mods=mods ])
 }
 
 func iup_cb_value (h) {
@@ -35,13 +42,15 @@ set iup.button = func (...) {
 val iup_canvas = iup.canvas
 set iup.canvas = func (...) {
     val h = iup_canvas(...)
-    set h.action = iup_cb_canvas_action
+    set h.action    = iup_cb_action_canvas
+    set h.button_cb = iup_cb_button
     return(h)
 }
 
 val iup_list = iup.list
 set iup.list = func (...) {
     val h = iup_list(...)
+    set h.action          = iup_cb_action_list
     set h.valuechanged_cb = iup_cb_value
     return(h)
 }
@@ -131,8 +140,18 @@ spawn {
             set out.title = txt2.value
         }
     } with {
-        every (:value, evt.h==lst) {
-            set out.title = lst.value
+        every (:action, evt.h==lst) {
+            set out.title = "[" ++ tostring(evt.item) ++ "]: " ++ evt.text ++ " = " ++ tostring(evt.state)
+        }
+    } with {
+        par {
+            every (:action, evt.h==cav) {
+                set out.title = "redraw canvas"
+            }
+        } with {
+            every (:button, evt.h==cav) {
+                set out.title = "canvas: " ++ tostring(evt.button)++','++tostring(evt.pressed) ++ ", (" ++ tostring(evt.x) ++ ',' ++ tostring(evt.y) ++ ")"
+            }
         }
     }
 }
