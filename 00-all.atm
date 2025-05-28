@@ -9,36 +9,47 @@ iup.timer <- [
     }
 ]
 
-func showxy (dlg, ...) {
+set iup.showxy = func (dlg, ...) {
     return(dlg.showxy(dlg, ...))
 }
 
-func iup_action (...) {
-    emit(:action, ...)
+func iup_cb_action (h) {
+    emit(:action [ h=h ])
 }
 
-func iup_value (...) {
-    emit(:value, ...)
+func iup_cb_canvas_action (h, x, y) {
+    emit(:canvas [ h=h, x=x, y=y ])
+}
+
+func iup_cb_value (h) {
+    emit(:value [ h=h ])
 }
 
 val iup_button = iup.button
 set iup.button = func (...) {
     val h = iup_button(...)
-    set h.action = iup_action
+    set h.action = iup_cb_action
     return(h)
 }
 
-val iup_text = iup.text
-set iup.text = func (...) {
-    val h = iup_text(...)
-    set h.valuechanged_cb = iup_value
+val iup_canvas = iup.canvas
+set iup.canvas = func (...) {
+    val h = iup_canvas(...)
+    set h.action = iup_cb_canvas_action
     return(h)
 }
 
 val iup_list = iup.list
 set iup.list = func (...) {
     val h = iup_list(...)
-    set h.valuechanged_cb = iup_value
+    set h.valuechanged_cb = iup_cb_value
+    return(h)
+}
+
+val iup_text = iup.text
+set iup.text = func (...) {
+    val h = iup_text(...)
+    set h.valuechanged_cb = iup_cb_value
     return(h)
 }
 
@@ -86,6 +97,9 @@ val but = iup.button <- [
     size  = 60,
 ]
 
+val cav = iup.canvas <- [
+]
+
 val out = iup.label <- [
     title = "label title",
 ]
@@ -93,7 +107,7 @@ val out = iup.label <- [
 val box = iup.vbox <- [
     ngap = 10,
     alignment = "acenter",
-    lbl, txt1, txt2, lst, gau, but, out,
+    lbl, txt1, txt2, lst, gau, but, cav, out,
 ]
 
 val dlg = iup.dialog <- [
@@ -109,19 +123,19 @@ spawn {
         }
     }
     par {
-        every (:action, evt==but) {
+        every (:action, evt.h==but) {
             set out.title = "button clicked"
         }
     } with {
-        every (:value, evt==txt2) {
+        every (:value, evt.h==txt2) {
             set out.title = txt2.value
         }
     } with {
-        every (:value, evt==lst) {
+        every (:value, evt.h==lst) {
             set out.title = lst.value
         }
     }
 }
 
-dlg->showxy(iup.CENTER, iup.CENTER)
+iup.showxy(dlg, iup.CENTER, iup.CENTER)
 iup.main()
