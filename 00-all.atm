@@ -1,6 +1,14 @@
 set package.cpath = package.cpath ++ ';/usr/lib64/libiuplua54.so'
 require <- "iuplua"
 
+iup.timer <- [
+    time = 100,
+    run  = "YES",
+    action_cb = func () {
+        emit(:clock, 100)
+    }
+]
+
 func showxy (dlg, ...) {
     return(dlg.showxy(dlg, ...))
 }
@@ -8,6 +16,7 @@ func showxy (dlg, ...) {
 func iup_action (...) {
     emit(:action, ...)
 }
+
 func iup_value (...) {
     emit(:value, ...)
 }
@@ -66,8 +75,8 @@ val lst = iup.list <- [
 ]
 
 val gau = iup.gauge <- [
-    min = 0.1,
-    max = 30,
+    min = 0,
+    max = 100,
     ;;expand = "HORIZONTAL",
     ;;showtext = "NO",
 ]
@@ -94,12 +103,11 @@ val dlg = iup.dialog <- [
 ]
 
 spawn {
-;;;
     spawn {
-        every 100:ms {
+        every @.100 {
+            set gau.value = (gau.value + 1) % gau.max
         }
     }
-;;;
     par {
         every (:action, evt==but) {
             set out.title = "button clicked"
