@@ -1,66 +1,44 @@
-set package.cpath = package.cpath ++ ';/usr/lib64/libiuplua54.so'
-require <- "iuplua"
+require "atmos.env.iup"
 
+package.cpath = package.cpath .. ';/usr/lib64/libiuplua54.so'
 require("iuplua")
 
-val iup_button = iup.button
-set iup.button = func (...) {
-    val h = iup_button(...)
-    set h.action = iup_action
-    return(h)
-}
+function attrib2number(value)
+  if not value or value == "" then
+    return 0
+  else
+    return tonumber(value)
+  end
+end
 
-func iup_value (...) {
-    emit(:value, ...)
-}
+function fahrenheit2celcius(temp)
+  return (temp - 32) * (5./9.)
+end
 
-val iup_text = iup.text
-set iup.text = func (...) {
-    val h = iup_text(...)
-    set h.valuechanged_cb = iup_value
-    return(h)
-}
+function celcius2fahrenheit(temp)
+  return temp * (9./5.) + 32
+end
 
-func attrib2number(value) {
-  if !value || (value=="") {
-    return (0)
-  } else {
-    return (tonumber(value))
-  }
-}
+--********************************** Main *****************************************
 
-func fahrenheit2celcius(temp) {
-  return ((temp - 32) * (5./9.))
-}
+txt_celcius = iup.text{size = "60", mask = "[+/-]?(/d+/.?/d*|/./d+)"}
+lbl_celcius = iup.label{title = "Celcius = "}
 
-func celcius2fahrenheit(temp) {
-  return ((temp * (9./5.)) + 32)
-}
+txt_fahrenheit = iup.text{size = "60", mask = "[+/-]?(/d+/.?/d*|/./d+)"}
+lbl_fahrenheit = iup.label{title = "Fahrenheit"}
 
-;;********************************** Main *****************************************
+dlg = iup.dialog{iup.hbox{txt_celcius, lbl_celcius, txt_fahrenheit, lbl_fahrenheit; ngap = "10", alignment = "ACENTER"}, title = "TempConv", margin = "10x10"}
 
-val txt_celcius = iup.text  <- [size = "60", mask = "[+/-]?(/d+/.?/d*|/./d+)"]
-val lbl_celcius = iup.label <- [title = "Celcius = "]
+dlg:showxy( iup.CENTER, iup.CENTER )
 
-val txt_fahrenheit = iup.text <- [size = "60", mask = "[+/-]?(/d+/.?/d*|/./d+)"]
-val lbl_fahrenheit = iup.label <- [title = "Fahrenheit"]
-
-val dlg = iup.dialog <- [iup.hbox <- [txt_celcius, lbl_celcius, txt_fahrenheit, lbl_fahrenheit, ngap = "10", alignment = "ACENTER"], title = "TempConv", margin = "10x10"]
-
-dlg.showxy(dlg, iup.CENTER, iup.CENTER )
-
-spawn {
-    par {
-        every :value , evt==txt_celcius {
-            set txt_fahrenheit.value = celcius2fahrenheit(attrib2number(txt_celcius.value))
-        }
-    } with {
-        every :value , evt==txt_fahrenheit {
-            set txt_celcius.value = fahrenheit2celcius(attrib2number(txt_fahrenheit.value))
-        }
-    }
-}
-
-if (iup.MainLoopLevel()==0) {
-  iup.MainLoop()
-}
+call(function ()
+    par(function ()
+        every(txt_celcius,'value', function ()
+            txt_fahrenheit.value = celcius2fahrenheit(attrib2number(txt_celcius.value))
+        end)
+    end, function ()
+        every(txt_fahrenheit, function ()
+            txt_celcius.value = fahrenheit2celcius(attrib2number(txt_fahrenheit.value))
+        end)
+    end)
+end)
