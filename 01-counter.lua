@@ -1,45 +1,30 @@
-set package.cpath = package.cpath ++ ';/usr/lib64/libiuplua54.so'
-require <- "iuplua"
+require "atmos.env.iup"
 
-var counter = 0
+package.cpath = package.cpath .. ';/usr/lib64/libiuplua54.so'
+require("iuplua")
 
-func addCount () {
-	set counter = counter + 1
-}
+counter = 0
 
-func getCount () {
-	return(counter)
-}
+function addCount()
+	counter = counter + 1
+end
 
-func iup_action (...) {
-    emit(:action, ...)
-}
+function getCount()
+	return counter
+end
 
-val iup_button = iup.button
-set iup.button = func (...) {
-    val h = iup_button(...)
-    set h.action = iup_action
-    return(h)
-}
+--********************************** Main *****************************************
 
-;;********************************** Main *****************************************
+txt_count = iup.text{value = getCount(), readonly = "YES",  size = "60"}
+btn_count = iup.button{title = "Count", size = "60"}
 
-val txt_count = iup.text <- [value = getCount(), readonly = "YES",  size = "60"]
-val btn_count = iup.button <- [title = "Count", size = "60"]
+dlg = iup.dialog{iup.hbox{txt_count, btn_count; ngap = "10"}, title = "Counter", margin = "10x10"}
 
-val dlg = iup.dialog <- [
-    title="Counter", margin="10x10",
-    iup.hbox <- [txt_count, btn_count, ngap="10"],
-]
-dlg.showxy(dlg, iup.CENTER, iup.CENTER )
+dlg:showxy( iup.CENTER, iup.CENTER )
 
-spawn {
-    every (:action, evt==btn_count) {
+call(function ()
+    every(btn_count,'action', function ()
         addCount()
-        set txt_count.value = getCount()
-    }
-}
-
-if (iup.MainLoopLevel()==0) {
-  iup.MainLoop()
-}
+        txt_count.value = getCount()
+    end)
+end)
