@@ -12,13 +12,15 @@ call(function ()
         local cli = assert(s.xaccept(srv))
         print("accept", cli:getpeername())
         spawn_in(clis, function ()
-            while true do
-                local v = s.xrecv(cli)
-                assert(v == '?')
-                local x = (math.random() >= 0.5) and '1' or '0'
-                await(clock{s=2})
-                cli:send(x)
-            end
+            watching(cli,'closed', function ()
+                while true do
+                    local v = s.xrecv(cli)
+                    assert(v == '?')
+                    local x = (math.random() >= 0.5) and '1' or '0'
+                    await(clock{s=2})
+                    cli:send(x)
+                end
+            end)
         end)
     end
 end)
