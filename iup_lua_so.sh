@@ -18,6 +18,8 @@ f iup
 f iuptuio
 f iupweb
 
+ldconfig
+
 g()
 {
     ln -s /usr/lib64/lib$154.so /usr/local/lib/lua/5.4/$1.so
