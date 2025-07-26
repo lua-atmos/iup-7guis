@@ -23,14 +23,14 @@ dlg = iup.dialog{iup.hbox{txt_count, btn_count; ngap = "10"}, title = "Counter",
 
 dlg:showxy( iup.CENTER, iup.CENTER )
 
-local env = {
-    init = function (on)
-        env_sok.init(on)
-        env_iup.init(on)
+atmos.env = {
+    close = function ()
+        env_sok.env.close()
+        env_iup.env.close()
     end,
     loop = env_iup.loop,
 }
-    
+
 local opts = { clock=false }
 iup.SetIdle(function ()
     env_sok.step(opts)
@@ -39,7 +39,7 @@ end)
 local socket = require "socket"
 local s = env_sok
 
-atmos.call(env, function ()
+atmos.call(function ()
     local cli = assert(s.xtcp())
     assert(s.xconnect(cli, "localhost", 22222))
 
