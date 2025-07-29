@@ -1,4 +1,3 @@
-package.cpath = package.cpath .. ';/usr/lib64/libiuplua54.so'
 require("iuplua")
 
 function attrib2number(value)
