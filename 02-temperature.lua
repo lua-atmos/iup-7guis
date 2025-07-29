@@ -1,5 +1,4 @@
 require "atmos.env.iup"
-
 require("iuplua")
 
 function attrib2number(value)

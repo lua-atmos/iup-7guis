@@ -1,7 +1,6 @@
 local atmos = require "atmos"
 local env_sok = require "atmos.env.socket"
 local env_iup = require "atmos.env.iup"
-
 require("iuplua")
 
 counter = 0

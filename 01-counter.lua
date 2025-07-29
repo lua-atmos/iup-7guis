@@ -1,5 +1,4 @@
 require "atmos.env.iup"
-
 require("iuplua")
 
 counter = 0
