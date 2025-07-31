@@ -30,10 +30,14 @@ atmos.env = {
     loop = env_iup.loop,
 }
 
-local opts = { clock=false }
+env_iup.env.idle = function ()
+    env_sok.step { clock=false, ms=0 }
+end
+--[[
 iup.SetIdle(function ()
-    env_sok.step(opts)
+    env_sok.step { clock=false, ms=0 }
 end)
+]]
 
 local socket = require "socket"
 local s = env_sok
